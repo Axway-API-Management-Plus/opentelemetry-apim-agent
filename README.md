@@ -69,8 +69,6 @@ export OTEL_METRICS_EXPORTER=none
     </ConfigurationFragment>
     ```
 
-
-  ![image](https://user-images.githubusercontent.com/58127265/234663741-32b38f29-371a-4413-9c1a-5b81b6a56af8.png)
 ## Requests captured in OpenTelemetry
 - Policy exposed as Endpoint.
 - API manager Traffic
