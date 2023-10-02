@@ -1,0 +1,49 @@
+plugins {
+    id 'java'
+    id "io.freefair.aspectj.post-compile-weaving" version "8.3"
+
+}
+
+group = 'com.axway.apim'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    mavenCentral()
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ['-Xlint:deprecation']
+}
+
+def apim_folder = '/Users/rnatarajan/v7apim/may2023/system'
+
+
+dependencies {
+    implementation fileTree(dir: "${apim_folder}/lib", include: '*.jar')
+    implementation fileTree(dir: "${apim_folder}/lib/jce", include: '*.jar')
+    implementation fileTree(dir: "${apim_folder}/lib/plugins", include: '*.jar')
+    implementation group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.20.1'
+    implementation("io.opentelemetry:opentelemetry-api:1.30.1");
+    implementation("io.opentelemetry:opentelemetry-sdk:1.30.1");
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.30.1");
+
+    implementation("io.opentelemetry:opentelemetry-sdk-metrics:1.30.1");
+    implementation("io.opentelemetry:opentelemetry-exporter-logging:1.30.1");
+    implementation("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure:1.30.1");
+   implementation("io.opentelemetry:opentelemetry-semconv:1.30.1-alpha");
+
+  //  implementation("io.opentelemetry.semconv:opentelemetry.semconv:1.21.0-alpha");
+
+    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.12.4'
+    testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: '2.0.9'
+    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
+}
+jar {
+    metaInf { from('src/main/resources/aop.xml') }
+}
