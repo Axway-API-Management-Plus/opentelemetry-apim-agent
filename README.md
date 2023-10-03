@@ -52,7 +52,13 @@ Copy following jar files
   - [opentelemetry-sdk-logs-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-logs/1.30.1/opentelemetry-sdk-logs-1.30.1.jar)
 - Copy Dynatrace one agent library - https://repo1.maven.org/maven2/com/dynatrace/oneagent/sdk/java/oneagent-sdk/1.8.0/oneagent-sdk-1.8.0.jar to  apigateway/ext/lib
 - Copy Aspectj weaver - https://repo1.maven.org/maven2/org/aspectj/aspectjweaver/1.9.6/aspectjweaver-1.9.6.jar to  apigateway/ext/lib
-- Sample configuration for Jaeger
+
+# Testing with Jaeger
+- Start Jaeger server
+```
+docker run --name jaeger   -e COLLECTOR_OTLP_ENABLED=true   -p 16686:16686   -p 4317:4317   -p 4318:4318   jaegertracing/all-in-one:1.49
+```
+- Environment variables for API Gateway to  send metrics to Jaeger
 
 ```
 export OTEL_EXPORTER_OTLP_ENDPOINT=http://10.129.61.129:4317
@@ -61,13 +67,14 @@ export OTEL_TRACES_EXPORTER=otlp
 export OTEL_SERVICE_NAME=apim-gw
 export OTEL_METRICS_EXPORTER=none
 ```
-- Restart API Gateway instances
 - Create a file named jvm.xml under APIGATEWAY_INSTALL_DIR/apigateway/conf/
     ```xml
     <ConfigurationFragment>
         <VMArg name="-javaagent:/home/axway/Axway-7.7.0-Aug2021/apigateway/ext/lib/aspectjweaver-1.9.6.jar"/>
     </ConfigurationFragment>
     ```
+- Restart API Gateway instances
+
 
 ## Requests captured in OpenTelemetry
 - Policy exposed as Endpoint.

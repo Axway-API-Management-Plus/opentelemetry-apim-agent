@@ -2,8 +2,6 @@ package com.axway.apim.opentelemetry;
 
 import com.vordel.circuit.Message;
 import com.vordel.dwe.CorrelationID;
-import com.vordel.dwe.Util;
-import com.vordel.dwe.http.ServerTransaction;
 import com.vordel.mime.HeaderSet;
 import com.vordel.trace.Trace;
 import io.opentelemetry.api.OpenTelemetry;
@@ -35,33 +33,37 @@ public class HttpServer {
         HeaderSet headerSet = (HeaderSet) message.get(Utils.HTTP_HEADERS);
         Context context = TEXT_MAP_PROPAGATOR.extract(Context.current(), headerSet, Utils.getter);
         String requestUri = Utils.getRequestURL(message);
+        Trace.info("Context "+context);
         Span span = tracer.spanBuilder(httpVerb + " " + requestUri).setParent(context).setSpanKind(SpanKind.SERVER).startSpan();
-
         try (Scope scope = span.makeCurrent()) {
-            // Set the Semantic Convention
-            span.setAttribute("component", "http");
-            span.setAttribute("http.method", httpVerb);
-
-            URL requestUrl = (URL) message.get("http.request.url");
-            if(requestUrl != null){
-                Utils.addHttpDetails(span, requestUrl.toString(), requestUri, message);
-            }else {
-                Utils.addHttpDetails(span, null, requestUri, message);
-            }
-            String appName = (String) message.getOrDefault("authentication.application.name", Utils.DEFAULT);
-            String orgName = (String) message.getOrDefault("authentication.organization.name", Utils.DEFAULT);
-            String appId = (String) message.getOrDefault("authentication.subject.id", Utils.DEFAULT);
-            addRequestAttributes(span, appName, orgName, appId, message.getIDBase());
-            if (pjp != null) {
-                try {
-                    return pjp.proceed();
-                } catch (Throwable e) {
-                    throw e;
+       // try (Scope scope = context.makeCurrent()) {
+            // Automatically use the extracted SpanContext as parent.
+       //     Span span = tracer.spanBuilder(httpVerb + " " + requestUri).setSpanKind(SpanKind.SERVER).startSpan();
+            try {
+                // Set the Semantic Convention
+                span.setAttribute("component", "http");
+                span.setAttribute("http.method", httpVerb);
+                URL requestUrl = (URL) message.get("http.request.url");
+                if (requestUrl != null) {
+                    Utils.addHttpDetails(span, requestUrl.toString(), requestUri, message);
+                } else {
+                    Utils.addHttpDetails(span, null, requestUri, message);
                 }
+                String appName = (String) message.getOrDefault("authentication.application.name", Utils.DEFAULT);
+                String orgName = (String) message.getOrDefault("authentication.organization.name", Utils.DEFAULT);
+                String appId = (String) message.getOrDefault("authentication.subject.id", Utils.DEFAULT);
+                addRequestAttributes(span, appName, orgName, appId, message.getIDBase());
+                if (pjp != null) {
+                    try {
+                        return pjp.proceed();
+                    } catch (Throwable e) {
+                        throw e;
+                    }
+                }
+            } finally {
+                // Close the span
+                span.end();
             }
-        } finally {
-            // Close the span
-            span.end();
         }
         return null;
     }

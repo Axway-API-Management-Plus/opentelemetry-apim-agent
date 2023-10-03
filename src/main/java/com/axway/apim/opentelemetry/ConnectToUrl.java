@@ -18,16 +18,14 @@ public class ConnectToUrl {
     private static final TextMapPropagator TEXT_MAP_PROPAGATOR = Configuration.getInstance().getPropagators().getTextMapPropagator();
 
     public Object httpClient(ProceedingJoinPoint pjp, Message message, Circuit circuit, HeaderSet requestHeaders, String httpVerb) throws Throwable {
-
-        HeaderSet headerSet = (HeaderSet) message.get(Utils.HTTP_HEADERS);
-        Context context = TEXT_MAP_PROPAGATOR.extract(Context.current(), headerSet, Utils.getter);
         String requestUrl = Utils.getRequestURL(message);
-        Span span = TRACER.spanBuilder(requestUrl).setParent(context).setSpanKind(SpanKind.CLIENT).startSpan();
+        Span span = TRACER.spanBuilder(requestUrl).setSpanKind(SpanKind.CLIENT).startSpan();
         try (Scope scope = span.makeCurrent()) {
             span.setAttribute(SemanticAttributes.HTTP_METHOD, httpVerb);
             span.setAttribute("component", "http");
             String url = (String) message.get("destinationURL");
             Utils.addHttpDetails(span, url, requestUrl, message);
+            TEXT_MAP_PROPAGATOR.inject(Context.current(), requestHeaders, Utils.setter);
             if (pjp != null) {
                 try {
                     return pjp.proceed();

@@ -5,6 +5,7 @@ import com.vordel.dwe.http.ServerTransaction;
 import com.vordel.mime.HeaderSet;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.propagation.TextMapGetter;
+import io.opentelemetry.context.propagation.TextMapSetter;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
@@ -24,9 +25,21 @@ public final class Utils {
             @Nullable
             @Override
             public String get(@Nullable HeaderSet carrier, String key) {
-                return String.join(",", convertIterableFromIterator(carrier.getHeaders(key)));
+                if (carrier != null) {
+                    return carrier.getHeader(key);
+                }
+                return null;
             }
         };
+
+    // setup context on outgoing headers
+    public static final TextMapSetter<HeaderSet> setter =
+            (carrier, key, value) -> {
+                // Insert the context as Header
+                if (carrier != null) {
+                    carrier.setHeader(key, value);
+                }
+            };
 
 
     private Utils() {
@@ -38,19 +51,6 @@ public final class Utils {
         return () -> iterator;
     }
 
-    public static String readHostNameFromHttpHeader(Message message) {
-        HeaderSet httpHeaders = (HeaderSet) message.get(HTTP_HEADERS);
-        if (httpHeaders == null)
-            return "0.0.0.0";
-        String host = (String) httpHeaders.get("Host");
-        if (host == null)
-            return "0.0.0.0";
-        if (host.contains(":")) {
-            return host.split(":")[0];
-        }
-        return host;
-    }
-
     public static String getRequestURL(Message message) {
         return message.getOrDefault("http.request.uri", message.get("http.request.path")).toString();
     }
@@ -59,7 +59,7 @@ public final class Utils {
         return message.getOrDefault("http.request.verb", "GET").toString();
     }
 
-    public static void addHttpDetails(Span span, String url, String requestUri, Message message){
+    public static void addHttpDetails(Span span, String url, String requestUri, Message message) {
              /*
          One of the following is required:
          - http.scheme, http.host, http.target
