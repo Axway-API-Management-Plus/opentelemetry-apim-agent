@@ -73,7 +73,7 @@ public final class Utils {
             String port = (String) message.get("message.source");
             String host = ((ServerTransaction) message.get("http.client")).getHost();
             span.setAttribute("http.scheme", "http");
-            if (port != null && !host.isEmpty())
+            if (port != null && !port.isEmpty())
                 span.setAttribute("http.host", host + ":" + port);
             else
                 span.setAttribute("http.host", host);

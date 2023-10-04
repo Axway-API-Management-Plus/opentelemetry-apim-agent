@@ -32,8 +32,9 @@ public class HttpServer {
 
         HeaderSet headerSet = (HeaderSet) message.get(Utils.HTTP_HEADERS);
         Context context = TEXT_MAP_PROPAGATOR.extract(Context.current(), headerSet, Utils.getter);
+
         String requestUri = Utils.getRequestURL(message);
-        Trace.info("Context "+context);
+        Trace.debug("OpenTelemetry Context "+context);
         Span span = tracer.spanBuilder(httpVerb + " " + requestUri).setParent(context).setSpanKind(SpanKind.SERVER).startSpan();
         try (Scope scope = span.makeCurrent()) {
        // try (Scope scope = context.makeCurrent()) {
