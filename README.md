@@ -24,11 +24,10 @@ gradlew clean jar
 
 Copy following jar files
 
-- 
 
-- Copy opentelemetry-apim-agent--x.x.x.jar file to  apigateway/ext/lib and restart API Gateway instances
-
-- Copy opentelmetry sdk jar files
+- Copy opentelemetry-apim-agent--x.x.x.jar file to apigateway/ext/lib
+- Copy Aspectj weaver - https://repo1.maven.org/maven2/org/aspectj/aspectjweaver/1.9.6/aspectjweaver-1.9.6.jar to  apigateway/ext/lib
+- Copy opentelmetry sdk jar files to apigateway/ext/lib 
 
   - [opentelemetry-api-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-api/1.30.1/opentelemetry-api-1.30.1.jar)
   - [opentelemetry-exporter-logging-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-logging/1.30.1/opentelemetry-exporter-logging-1.30.1.jar)
@@ -50,15 +49,8 @@ Copy following jar files
   - [opentelemetry-exporter-common-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-common/1.30.1/opentelemetry-exporter-common-1.30.1.jar)
   - [opentelemetry-extension-incubator-1.30.1-alpha.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-extension-incubator/1.30.1-alpha/opentelemetry-extension-incubator-1.30.1-alpha.jar)
   - [opentelemetry-sdk-logs-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-logs/1.30.1/opentelemetry-sdk-logs-1.30.1.jar)
-- Copy Dynatrace one agent library - https://repo1.maven.org/maven2/com/dynatrace/oneagent/sdk/java/oneagent-sdk/1.8.0/oneagent-sdk-1.8.0.jar to  apigateway/ext/lib
-- Copy Aspectj weaver - https://repo1.maven.org/maven2/org/aspectj/aspectjweaver/1.9.6/aspectjweaver-1.9.6.jar to  apigateway/ext/lib
 
-# Testing with Jaeger
-- Start Jaeger server
-```
-docker run --name jaeger   -e COLLECTOR_OTLP_ENABLED=true   -p 16686:16686   -p 4317:4317   -p 4318:4318   jaegertracing/all-in-one:1.49
-```
-- Environment variables for API Gateway to  send metrics to Jaeger
+- Environment variables for API Gateway to send metrics to Jaeger / any other OTLP supported vendors
 
 ```
 export OTEL_EXPORTER_OTLP_ENDPOINT=http://10.129.61.129:4317
@@ -70,10 +62,17 @@ export OTEL_METRICS_EXPORTER=none
 - Create a file named jvm.xml under APIGATEWAY_INSTALL_DIR/apigateway/conf/
     ```xml
     <ConfigurationFragment>
-        <VMArg name="-javaagent:/home/axway/Axway-7.7.0-Aug2021/apigateway/ext/lib/aspectjweaver-1.9.6.jar"/>
+        <VMArg name="-javaagent:/home/axway/Axway-7.7.0/apigateway/ext/lib/aspectjweaver-1.9.6.jar"/>
     </ConfigurationFragment>
     ```
 - Restart API Gateway instances
+
+# Testing with Jaeger
+
+- Start Jaeger server
+```
+docker run --name jaeger   -e COLLECTOR_OTLP_ENABLED=true   -p 16686:16686   -p 4317:4317   -p 4318:4318   jaegertracing/all-in-one:1.49
+```
 
 
 ## Requests captured in OpenTelemetry
