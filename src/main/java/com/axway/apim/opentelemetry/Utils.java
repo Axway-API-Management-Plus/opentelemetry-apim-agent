@@ -9,6 +9,8 @@ import io.opentelemetry.context.propagation.TextMapSetter;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class Utils {
 
@@ -79,6 +81,26 @@ public final class Utils {
                 span.setAttribute("http.host", host);
             span.setAttribute("http.target", requestUri);
         }
+    }
+
+
+    public static void addHttpHeaders(Span span, String type, HeaderSet headers) {
+        StringBuilder headerPrefix = new StringBuilder();
+        headerPrefix.append(type);
+        headerPrefix.append(".http.header.");
+        String prefix = headerPrefix.toString();
+        if (headers != null) {
+            for (Map.Entry<String, HeaderSet.HeaderEntry> entry : headers.entrySet()) {
+                String value = getHeaderValues(entry);
+                span.setAttribute(prefix + entry.getKey(), value);
+            }
+        }
+    }
+
+    public static String getHeaderValues(Map.Entry<String, HeaderSet.HeaderEntry> entry) {
+        return entry.getValue().stream().
+            map(Object::toString).
+            collect(Collectors.joining(","));
     }
 
 }

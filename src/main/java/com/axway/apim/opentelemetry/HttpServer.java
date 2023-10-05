@@ -7,6 +7,7 @@ import com.vordel.trace.Trace;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
@@ -28,46 +29,50 @@ public class HttpServer {
         openTelemetry.getPropagators().getTextMapPropagator();
 
 
-    public Object aroundHttpServer(ProceedingJoinPoint pjp, Message message, String apiName, String httpVerb, String apiContextRoot) throws Throwable {
+    public Object aroundHttpServer(ProceedingJoinPoint pjp, Message message, String apiName, String httpVerb) throws Throwable {
 
+        Object pjpReturnObject;
         HeaderSet headerSet = (HeaderSet) message.get(Utils.HTTP_HEADERS);
         Context context = TEXT_MAP_PROPAGATOR.extract(Context.current(), headerSet, Utils.getter);
-
         String requestUri = Utils.getRequestURL(message);
-        Trace.debug("OpenTelemetry Context "+context);
+        Trace.debug("OpenTelemetry Context " + context);
         Span span = tracer.spanBuilder(httpVerb + " " + requestUri).setParent(context).setSpanKind(SpanKind.SERVER).startSpan();
         try (Scope scope = span.makeCurrent()) {
-       // try (Scope scope = context.makeCurrent()) {
+            // try (Scope scope = context.makeCurrent()) {
             // Automatically use the extracted SpanContext as parent.
-       //     Span span = tracer.spanBuilder(httpVerb + " " + requestUri).setSpanKind(SpanKind.SERVER).startSpan();
-            try {
-                // Set the Semantic Convention
-                span.setAttribute("component", "http");
-                span.setAttribute("http.method", httpVerb);
-                URL requestUrl = (URL) message.get("http.request.url");
-                if (requestUrl != null) {
-                    Utils.addHttpDetails(span, requestUrl.toString(), requestUri, message);
-                } else {
-                    Utils.addHttpDetails(span, null, requestUri, message);
-                }
-                String appName = (String) message.getOrDefault("authentication.application.name", Utils.DEFAULT);
-                String orgName = (String) message.getOrDefault("authentication.organization.name", Utils.DEFAULT);
-                String appId = (String) message.getOrDefault("authentication.subject.id", Utils.DEFAULT);
-                addRequestAttributes(span, appName, orgName, appId, message.getIDBase());
-                if (pjp != null) {
-                    try {
-                        return pjp.proceed();
-                    } catch (Throwable e) {
-                        throw e;
-                    }
-                }
-            } finally {
-                // Close the span
-                span.end();
+            //     Span span = tracer.spanBuilder(httpVerb + " " + requestUri).setSpanKind(SpanKind.SERVER).startSpan();
+
+            // Set the Semantic Convention
+            span.setAttribute("api.name", apiName);
+            span.setAttribute("component", "http");
+            span.setAttribute("http.method", httpVerb);
+            URL requestUrl = (URL) message.get("http.request.url");
+            if (requestUrl != null) {
+                Utils.addHttpDetails(span, requestUrl.toString(), requestUri, message);
+            } else {
+                Utils.addHttpDetails(span, null, requestUri, message);
             }
+            Utils.addHttpHeaders(span, "request", headerSet);
+            String appName = (String) message.getOrDefault("authentication.application.name", Utils.DEFAULT);
+            String orgName = (String) message.getOrDefault("authentication.organization.name", Utils.DEFAULT);
+            String appId = (String) message.getOrDefault("authentication.subject.id", Utils.DEFAULT);
+            addRequestAttributes(span, appName, orgName, appId, message.getIDBase());
+            pjpReturnObject = pjp.proceed();
+            int httpStatus = (int) message.getOrDefault("http.response.status", 0);
+            span.setStatus(StatusCode.OK, httpStatus + "");
+        } catch (Throwable e) {
+            int httpStatus = (int) message.getOrDefault("http.response.status", 0);
+            span.setStatus(StatusCode.ERROR, httpStatus + "");
+            span.recordException(e);
+            throw e;
+        } finally {
+            // Close the span
+            Utils.addHttpHeaders(span, "response", (HeaderSet) message.get(Utils.HTTP_HEADERS));
+            span.end();
         }
-        return null;
+        return pjpReturnObject;
     }
+
 
     public void addRequestAttributes(Span span, String appName, String orgName, String appId, CorrelationID correlationId) {
         Map<String, String> map = new HashMap<>();
