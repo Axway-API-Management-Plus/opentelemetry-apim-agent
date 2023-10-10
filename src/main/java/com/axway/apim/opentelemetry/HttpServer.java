@@ -88,7 +88,7 @@ public class HttpServer {
         if (correlationId != null) {
             map.put(Utils.AXWAY_CORRELATION_ID, "Id-" + correlationId);
         }
-        Trace.info("Dynatrace :: Application Id :" + appId + " - Application Name : " + appName);
+        Trace.info("OpenTelemetry :: Application Id :" + appId + " - Application Name : " + appName);
         addRequestAttributes(span, map);
     }
 
