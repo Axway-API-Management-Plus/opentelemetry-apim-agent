@@ -72,9 +72,10 @@ public final class Utils {
         if (url != null) {
             span.setAttribute("http.url", url);
         } else {
-            String port = (String) message.get("message.source");
-            String host = ((ServerTransaction) message.get("http.client")).getHost();
-            span.setAttribute("http.scheme", "http");
+            String port = (String) message.get("http.destination.port");
+            String host = (String) message.get("http.destination.host");
+            String protocol = (String) message.get("http.destination.protocol");
+            span.setAttribute("http.scheme", "protocol");
             if (port != null && !port.isEmpty())
                 span.setAttribute("http.host", host + ":" + port);
             else
