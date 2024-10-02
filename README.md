@@ -26,30 +26,35 @@ Copy following jar files
 
 
 - Copy opentelemetry-apim-agent--x.x.x.jar file to apigateway/ext/lib
-- Copy Aspectj weaver - https://repo1.maven.org/maven2/org/aspectj/aspectjweaver/1.9.6/aspectjweaver-1.9.6.jar to  apigateway/ext/lib
+- Copy Aspectj weaver - [ aspectjweaver-1.9.22.1.jar ](https://repo1.maven.org/maven2/org/aspectj/aspectjweaver/1.9.22.1/aspectjweaver-1.9.22.1.jar) to  apigateway/ext/lib
 - Copy opentelmetry sdk jar files to apigateway/ext/lib 
 
-  - [opentelemetry-api-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-api/1.30.1/opentelemetry-api-1.30.1.jar)
-  - [opentelemetry-exporter-logging-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-logging/1.30.1/opentelemetry-exporter-logging-1.30.1.jar)
-  - [opentelemetry-sdk-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk/1.30.1/opentelemetry-sdk-1.30.1.jar)
-  - [opentelemetry-sdk-metrics-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-metrics/1.30.1/opentelemetry-sdk-metrics-1.30.1.jar)
-  - [kotlin-stdlib-1.6.10.jar](https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/1.6.20/kotlin-stdlib-1.6.20.jar)
-  - [opentelemetry-api-events-1.30.1-alpha.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-api-events/1.30.1-alpha/opentelemetry-api-events-1.30.1-alpha.jar)
-  - [opentelemetry-exporter-otlp-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-otlp/1.30.1/opentelemetry-exporter-otlp-1.30.1.jar)       
-  - [opentelemetry-sdk-common-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-common/1.30.1/opentelemetry-sdk-common-1.30.1.jar)
-  - [opentelemetry-sdk-trace-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-trace/1.30.1/opentelemetry-sdk-trace-1.30.1.jar)
-  - [okhttp-4.11.0.jar](https://repo1.maven.org/maven2/com/squareup/okhttp3/okhttp/4.11.0/okhttp-4.11.0.jar)
-  - [opentelemetry-exporter-otlp-common-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-otlp/1.30.1/opentelemetry-exporter-otlp-1.30.1.jar)
-  - [opentelemetry-sdk-extension-autoconfigure-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-extension-autoconfigure-spi/1.30.1/opentelemetry-sdk-extension-autoconfigure-spi-1.30.1.jar)
-  - [opentelemetry-semconv-1.30.1-alpha.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-semconv/1.30.1-alpha/opentelemetry-semconv-1.30.1-alpha.jar)
-  - [okio-jvm-3.2.0.jar](https://repo1.maven.org/maven2/com/squareup/okio/okio-jvm/3.2.0/okio-jvm-3.2.0.jar)
-  - [opentelemetry-context-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-context/1.30.1/opentelemetry-context-1.30.1.jar)
-  - [opentelemetry-exporter-sender-okhttp-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-sender-okhttp/1.30.1/opentelemetry-exporter-sender-okhttp-1.30.1.jar)
-  - [opentelemetry-sdk-extension-autoconfigure-spi-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-extension-autoconfigure-spi/1.30.1/opentelemetry-sdk-extension-autoconfigure-spi-1.30.1.jar)
-  - [opentelemetry-exporter-common-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-common/1.30.1/opentelemetry-exporter-common-1.30.1.jar)
-  - [opentelemetry-extension-incubator-1.30.1-alpha.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-extension-incubator/1.30.1-alpha/opentelemetry-extension-incubator-1.30.1-alpha.jar)
-  - [opentelemetry-sdk-logs-1.30.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-logs/1.30.1/opentelemetry-sdk-logs-1.30.1.jar)
+  - [okhttp-4.12.0.jar](https://repo1.maven.org/maven2/com/squareup/okhttp3/okhttp/4.12.0/okhttp-4.12.0.jar)
+  - [okio-jvm-3.6.0.jar](https://repo1.maven.org/maven2/com/squareup/okio/okio-jvm/3.6.0/okio-jvm-3.6.0.jar)
 
+  - [opentelemetry-semconv-1.27.0-alpha.jar](https://repo1.maven.org/maven2/io/opentelemetry/semconv/opentelemetry-semconv/1.27.0-alpha/opentelemetry-semconv-1.27.0-alpha.jar)
+  
+  - [opentelemetry-api-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-api/1.42.1/opentelemetry-api-1.42.1.jar)
+  - [opentelemetry-api-incubator-1.42.1-alpha.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-api-incubator/1.42.1-alpha/opentelemetry-api-incubator-1.42.1-alpha.jar)
+  
+  - [opentelemetry-context-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-context/1.42.1/opentelemetry-context-1.42.1.jar)
+
+  - [opentelemetry-exporter-common-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-common/1.42.1/opentelemetry-exporter-common-1.42.1.jar)
+  - [opentelemetry-exporter-logging-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-logging/1.42.1/opentelemetry-exporter-logging-1.42.1.jar)
+  - [opentelemetry-exporter-otlp-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-otlp/1.42.1/opentelemetry-exporter-otlp-1.42.1.jar)
+  - [opentelemetry-exporter-otlp-common-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-otlp/1.42.1/opentelemetry-exporter-otlp-common-1.42.1.jar)
+  - [opentelemetry-exporter-sender-okhttp-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-sender-okhttp/1.42.1/opentelemetry-exporter-sender-okhttp-1.42.1.jar)
+
+  - [opentelemetry-sdk-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk/1.42.1/opentelemetry-sdk-1.42.1.jar)
+  - [opentelemetry-sdk-common-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-common/1.42.1/opentelemetry-sdk-common-1.42.1.jar)
+  - [opentelemetry-sdk-extension-autoconfigure-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-extension-autoconfigure/1.42.1/opentelemetry-sdk-extension-autoconfigure-1.42.1.jar)
+  - [opentelemetry-sdk-extension-autoconfigure-spi-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-extension-autoconfigure-spi/1.42.1/opentelemetry-sdk-extension-autoconfigure-spi-1.42.1.jar)
+ 
+  
+  - [opentelemetry-extension-incubator-1.30.1-alpha.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-extension-incubator/1.30.1-alpha/opentelemetry-extension-incubator-1.30.1-alpha.jar)
+  - [opentelemetry-sdk-logs-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-logs/1.42.1/opentelemetry-sdk-logs-1.42.1.jar)
+  - [opentelemetry-sdk-metrics-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-metrics/1.42.1/opentelemetry-sdk-metrics-1.42.1.jar)
+  - [opentelemetry-sdk-trace-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-trace/1.42.1/opentelemetry-sdk-trace-1.42.1.jar)
 - Environment variables for API Gateway to send metrics to Jaeger / any other OTLP supported vendors
 
 ```
@@ -62,7 +67,7 @@ export OTEL_METRICS_EXPORTER=none
 - Create a file named jvm.xml under APIGATEWAY_INSTALL_DIR/apigateway/conf/
     ```xml
     <ConfigurationFragment>
-        <VMArg name="-javaagent:/home/axway/Axway-7.7.0/apigateway/ext/lib/aspectjweaver-1.9.6.jar"/>
+        <VMArg name="-javaagent:/home/axway/Axway-7.7.0/apigateway/ext/lib/aspectjweaver-1.9.22.1.jar"/>
     </ConfigurationFragment>
     ```
 - Restart API Gateway instances
