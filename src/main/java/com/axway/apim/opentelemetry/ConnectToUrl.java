@@ -10,7 +10,7 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.TextMapPropagator;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
+import io.opentelemetry.semconv.HttpAttributes;
 import org.aspectj.lang.ProceedingJoinPoint;
 
 public class ConnectToUrl {
@@ -23,7 +23,7 @@ public class ConnectToUrl {
         String requestUrl = Utils.getRequestURL(message);
         Span span = TRACER.spanBuilder(requestUrl).setSpanKind(SpanKind.CLIENT).startSpan();
         try (Scope scope = span.makeCurrent()) {
-            span.setAttribute(SemanticAttributes.HTTP_METHOD, httpVerb);
+            span.setAttribute(HttpAttributes.HTTP_REQUEST_METHOD, httpVerb);
             span.setAttribute("component", "http");
             span.setAttribute("Routing policy", circuit.getName());
             String url = (String) message.get("destinationURL");

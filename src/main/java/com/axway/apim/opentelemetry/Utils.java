@@ -1,7 +1,6 @@
 package com.axway.apim.opentelemetry;
 
 import com.vordel.circuit.Message;
-import com.vordel.dwe.http.ServerTransaction;
 import com.vordel.mime.HeaderSet;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.propagation.TextMapGetter;
