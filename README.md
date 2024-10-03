@@ -6,7 +6,7 @@ Axway APIM Integration with OpenTelemetry using OpenTelemetry Java SDK
 
 This artefact tested with following version:
 
-- V7.7 May 2023 
+- V7.7 May 2024 
 
 
 ## Compile/Build
