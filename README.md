@@ -31,6 +31,7 @@ Copy following jar files
 
   - [okhttp-4.12.0.jar](https://repo1.maven.org/maven2/com/squareup/okhttp3/okhttp/4.12.0/okhttp-4.12.0.jar)
   - [okio-jvm-3.6.0.jar](https://repo1.maven.org/maven2/com/squareup/okio/okio-jvm/3.6.0/okio-jvm-3.6.0.jar)
+  - [kotlin-stdlib-1.9.25.jar](https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/1.9.25/kotlin-stdlib-1.9.25.jar)
 
   - [opentelemetry-semconv-1.27.0-alpha.jar](https://repo1.maven.org/maven2/io/opentelemetry/semconv/opentelemetry-semconv/1.27.0-alpha/opentelemetry-semconv-1.27.0-alpha.jar)
   
@@ -42,7 +43,7 @@ Copy following jar files
   - [opentelemetry-exporter-common-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-common/1.42.1/opentelemetry-exporter-common-1.42.1.jar)
   - [opentelemetry-exporter-logging-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-logging/1.42.1/opentelemetry-exporter-logging-1.42.1.jar)
   - [opentelemetry-exporter-otlp-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-otlp/1.42.1/opentelemetry-exporter-otlp-1.42.1.jar)
-  - [opentelemetry-exporter-otlp-common-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-otlp/1.42.1/opentelemetry-exporter-otlp-common-1.42.1.jar)
+  - [opentelemetry-exporter-otlp-common-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-otlp-common/1.42.1/opentelemetry-exporter-otlp-common-1.42.1.jar)
   - [opentelemetry-exporter-sender-okhttp-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-sender-okhttp/1.42.1/opentelemetry-exporter-sender-okhttp-1.42.1.jar)
 
   - [opentelemetry-sdk-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk/1.42.1/opentelemetry-sdk-1.42.1.jar)
