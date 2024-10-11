@@ -1,0 +1,28 @@
+receivers:
+    otlp:
+        protocols:
+            grpc:
+                endpoint: 0.0.0.0:4317
+            http:
+                endpoint: 0.0.0.0:4318
+exporters:
+    datadog:
+        traces:
+            span_name_as_resource_name: true
+            trace_buffer: 500
+        hostname: "otelcol-docker"
+        api:
+            key: ${env:DD_API_KEY}
+            site: ${env:DD_SITE}
+
+connectors:
+    datadog/connector:
+
+service:
+    pipelines:
+        metrics:
+            receivers: [otlp, datadog/connector] # <- update this line
+            exporters: [datadog]
+        traces:
+            receivers: [otlp]
+            exporters: [datadog, datadog/connector]

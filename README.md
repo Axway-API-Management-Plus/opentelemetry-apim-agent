@@ -56,30 +56,9 @@ Copy following jar files
   - [opentelemetry-sdk-logs-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-logs/1.42.1/opentelemetry-sdk-logs-1.42.1.jar)
   - [opentelemetry-sdk-metrics-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-metrics/1.42.1/opentelemetry-sdk-metrics-1.42.1.jar)
   - [opentelemetry-sdk-trace-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-trace/1.42.1/opentelemetry-sdk-trace-1.42.1.jar)
-- Environment variables for API Gateway to send metrics to Jaeger
 
-```
-export OTEL_EXPORTER_OTLP_ENDPOINT=http://10.129.61.129:4317
-export OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=grpc
-export OTEL_TRACES_EXPORTER=otlp
-export OTEL_SERVICE_NAME=apim-gw
-export OTEL_METRICS_EXPORTER=none
-```
 
-- Environment variables for API Gateway to send metrics to New Relic
 
-```
-export OTEL_SERVICE_NAME=api-gw
-export OTEL_EXPERIMENTAL_EXPORTER_OTLP_RETRY_ENABLED=true
-export OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=BASE2_EXPONENTIAL_BUCKET_HISTOGRAM
-export OTEL_EXPERIMENTAL_RESOURCE_DISABLED_KEYS=process.command_args
-export OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp.nr-data.net
-export OTEL_EXPORTER_OTLP_HEADERS=api-key=<<license key>>
-export OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT=4095
-export OTEL_EXPORTER_OTLP_COMPRESSION=gzip
-export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-export OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta
-```
 
 - Create a file named jvm.xml under APIGATEWAY_INSTALL_DIR/apigateway/conf/
     ```xml
@@ -95,6 +74,64 @@ export OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta
 ```
 docker run --name jaeger   -e COLLECTOR_OTLP_ENABLED=true   -p 16686:16686   -p 4317:4317   -p 4318:4318   jaegertracing/all-in-one:1.49
 ```
+
+- Environment variables for API Gateway to send metrics to Jaeger
+
+```
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://10.129.61.129:4317
+export OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=grpc
+export OTEL_TRACES_EXPORTER=otlp
+export OTEL_SERVICE_NAME=apim-gw
+export OTEL_METRICS_EXPORTER=none
+```
+
+- Restart API Gateway
+
+# Testing with New Relic
+- Create a licence key
+- Environment variables for API Gateway to send metrics to New Relic
+
+```
+export OTEL_SERVICE_NAME=api-gw
+export OTEL_EXPERIMENTAL_EXPORTER_OTLP_RETRY_ENABLED=true
+export OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION=BASE2_EXPONENTIAL_BUCKET_HISTOGRAM
+export OTEL_EXPERIMENTAL_RESOURCE_DISABLED_KEYS=process.command_args
+export OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp.nr-data.net
+export OTEL_EXPORTER_OTLP_HEADERS=api-key=<<license key>>
+export OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT=4095
+export OTEL_EXPORTER_OTLP_COMPRESSION=gzip
+export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+export OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta
+```
+
+- Restart API Gateway
+
+# Testing with Datadog
+- Copy API key 
+    - Goto https://us3.datadoghq.com/organization-settings/api-keys and copy the key
+
+- Update datadog/docker-compose.yaml with key and site parameter 
+```yaml
+        environment:
+            - DD_API_KEY=6<apikey>
+            - DD_SITE=us3.datadoghq.com
+```
+- Start OTEL collector
+```bash
+$docker-compose -f datadog/docker-compose.yaml start
+```
+
+
+```
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://10.129.61.129:4317
+export OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=grpc
+export OTEL_TRACES_EXPORTER=otlp
+export OTEL_SERVICE_NAME=apim-gw
+export OTEL_METRICS_EXPORTER=none
+```
+
+
+- Restart API Gateway
 
 
 ## Requests captured in OpenTelemetry
