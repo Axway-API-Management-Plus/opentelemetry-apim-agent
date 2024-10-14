@@ -26,7 +26,7 @@ Copy following jar files
 
 
 - Copy opentelemetry-apim-agent--x.x.x.jar file to apigateway/ext/lib
-- Copy Aspectj weaver - [ aspectjweaver-1.9.22.1.jar ](https://repo1.maven.org/maven2/org/aspectj/aspectjweaver/1.9.22.1/aspectjweaver-1.9.22.1.jar) to  apigateway/ext/lib
+- Copy Aspectj weaver - [ aspectjweaver-1.9.6.jar ](https://repo1.maven.org/maven2/org/aspectj/aspectjweaver/1.9.6/aspectjweaver-1.9.6.jar) to  apigateway/ext/lib
 - Copy opentelmetry sdk jar files to apigateway/ext/lib 
 
   - [okhttp-4.12.0.jar](https://repo1.maven.org/maven2/com/squareup/okhttp3/okhttp/4.12.0/okhttp-4.12.0.jar)
