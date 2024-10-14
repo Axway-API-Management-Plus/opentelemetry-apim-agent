@@ -3,7 +3,7 @@ services:
     otel-collector:
         image: otel/opentelemetry-collector-contrib
         volumes:
-            - ./otel2.yaml:/etc/otelcol-contrib/config.yaml
+            - ./otel.yaml:/etc/otelcol-contrib/config.yaml
         ports:
             - 1888:1888 # pprof extension
             - 8888:8888 # Prometheus metrics exposed by the Collector
@@ -13,5 +13,5 @@ services:
             - 4318:4318 # OTLP http receiver
             - 55679:55679 # zpages extension
         environment:
-            - DD_API_KEY=6<apikey>
+            - DD_API_KEY=<apikey>
             - DD_SITE=us3.datadoghq.com

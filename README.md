@@ -113,25 +113,58 @@ export OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=delta
 - Update datadog/docker-compose.yaml with key and site parameter 
 ```yaml
         environment:
-            - DD_API_KEY=6<apikey>
+            - DD_API_KEY=<apikey>
             - DD_SITE=us3.datadoghq.com
 ```
 - Start OTEL collector
 ```bash
 $docker-compose -f datadog/docker-compose.yaml start
 ```
-
-
+- Setup environment variable for api gateway
 ```
-export OTEL_EXPORTER_OTLP_ENDPOINT=http://10.129.61.129:4317
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
 export OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=grpc
 export OTEL_TRACES_EXPORTER=otlp
 export OTEL_SERVICE_NAME=apim-gw
 export OTEL_METRICS_EXPORTER=none
 ```
 
+- Restart API Gateway
+
+# Testing with Dynatrace
+
+## Set up your Dynatrace account and environment variables
+  - Create a Dynatrace account. If you don’t have one, you can use a [trial account](https://www.dynatrace.com/signup/).
+
+ -  create an access token that includes scopes for the following:
+
+    Ingest OpenTelemetry traces (openTelemetryTrace.ingest)
+    Ingest metrics (metrics.ingest) - Currently not used
+    Ingest logs (logs.ingest) - currently not used
+For details, see [Dynatrace API – Tokens and authentication](https://docs.dynatrace.com/docs/dynatrace-api/basics/dynatrace-api-authentication) in the Dynatrace documentation.
+
+- Update dynatrace/docker-compose.yaml with api key and dynatrace endpoint
+```yaml
+        environment:
+            - DT_API_TOKEN=<Access Token>
+            - DT_ENDPOINT=https://{your-env-id}.live.dynatrace.com/api/v2/otlp
+```
+
+- Start OTEL collector
+```bash
+$docker-compose -f dynatrace/docker-compose.yaml start
+```
+- Setup environment variable for api gateway
+```
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://loclhost:4317
+export OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=grpc
+export OTEL_TRACES_EXPORTER=otlp
+export OTEL_SERVICE_NAME=apim-gw
+export OTEL_METRICS_EXPORTER=none
+```
 
 - Restart API Gateway
+
 
 
 ## Requests captured in OpenTelemetry
