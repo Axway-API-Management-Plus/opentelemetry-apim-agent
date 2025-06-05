@@ -40,8 +40,9 @@ public class ConnectToUrl {
                 span.setAttribute("error.type", httpStatusMessage);
             }
         } catch (Throwable e) {
+            int httpStatus = (int) message.getOrDefault("http.response.status", 0);
             String httpStatusMessage = (String) message.getOrDefault("http.response.info", "");
-            span.setStatus(StatusCode.ERROR, httpStatusMessage);
+            span.setStatus(StatusCode.ERROR, httpStatus + "-" +httpStatusMessage);
             span.recordException(e);
             throw e;
         } finally {

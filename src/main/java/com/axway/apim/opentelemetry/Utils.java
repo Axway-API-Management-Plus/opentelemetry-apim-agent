@@ -68,13 +68,14 @@ public final class Utils {
          - http.scheme, net.host.name, net.host.port, http.target
          - http.url
         */
+        span.setAttribute("component", "http");
         if (url != null) {
             span.setAttribute("http.url", url);
         } else {
             String port = (String) message.get("http.destination.port");
             String host = (String) message.get("http.destination.host");
             String protocol = (String) message.get("http.destination.protocol");
-            span.setAttribute("http.scheme", "protocol");
+            span.setAttribute("http.scheme", protocol);
             if (port != null && !port.isEmpty())
                 span.setAttribute("http.host", host + ":" + port);
             else
