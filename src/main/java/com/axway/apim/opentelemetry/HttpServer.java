@@ -37,12 +37,7 @@ public class HttpServer {
         String requestUri = Utils.getRequestURL(message);
         Trace.debug("OpenTelemetry Context " + context);
         Span span = tracer.spanBuilder(httpVerb + " " + requestUri).setParent(context).setSpanKind(SpanKind.SERVER).startSpan();
-        try (Scope scope = span.makeCurrent()) {
-            // try (Scope scope = context.makeCurrent()) {
-            // Automatically use the extracted SpanContext as parent.
-            //     Span span = tracer.spanBuilder(httpVerb + " " + requestUri).setSpanKind(SpanKind.SERVER).startSpan();
-
-            // Set the Semantic Convention
+        try (Scope ignored = span.makeCurrent()) {
             span.setAttribute("api.name", apiName);
             span.setAttribute("component", "http");
             span.setAttribute("http.method", httpVerb);
@@ -59,10 +54,14 @@ public class HttpServer {
             addRequestAttributes(span, appName, orgName, appId, message.getIDBase());
             pjpReturnObject = pjp.proceed();
             int httpStatus = (int) message.getOrDefault("http.response.status", 0);
-            span.setStatus(StatusCode.OK, httpStatus + "");
+            String httpStatusMessage = (String) message.getOrDefault("http.response.info", "");
+            if (httpStatus > 500) {
+                span.setStatus(StatusCode.ERROR, httpStatusMessage);
+                span.setAttribute("error.type", "internal server error");
+            }
         } catch (Throwable e) {
-            int httpStatus = (int) message.getOrDefault("http.response.status", 0);
-            span.setStatus(StatusCode.ERROR, httpStatus + "");
+            String httpStatusMessage = (String) message.getOrDefault("http.response.info", "");
+            span.setStatus(StatusCode.ERROR, httpStatusMessage);
             span.recordException(e);
             throw e;
         } finally {

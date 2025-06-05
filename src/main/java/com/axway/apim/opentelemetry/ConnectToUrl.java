@@ -22,7 +22,7 @@ public class ConnectToUrl {
         Object pjpReturnObject;
         String requestUrl = Utils.getRequestURL(message);
         Span span = TRACER.spanBuilder(requestUrl).setSpanKind(SpanKind.CLIENT).startSpan();
-        try (Scope scope = span.makeCurrent()) {
+        try (Scope ignored = span.makeCurrent()) {
             span.setAttribute(HttpAttributes.HTTP_REQUEST_METHOD, httpVerb);
             span.setAttribute("component", "http");
             span.setAttribute("Routing policy", circuit.getName());
@@ -32,10 +32,16 @@ public class ConnectToUrl {
             TEXT_MAP_PROPAGATOR.inject(Context.current(), requestHeaders, Utils.setter);
             pjpReturnObject = pjp.proceed();
             int httpStatus = (int) message.getOrDefault("http.response.status", 0);
-            span.setStatus(StatusCode.OK, httpStatus + "");
+            String httpStatusMessage = (String) message.getOrDefault("http.response.info", "");
+            if (httpStatus > 400 && httpStatus < 500) {
+                span.setStatus(StatusCode.ERROR, httpStatusMessage);
+            } else if (httpStatus > 500) {
+                span.setStatus(StatusCode.ERROR, httpStatusMessage);
+                span.setAttribute("error.type", httpStatusMessage);
+            }
         } catch (Throwable e) {
-            int httpStatus = (int) message.getOrDefault("http.response.status", 0);
-            span.setStatus(StatusCode.ERROR, httpStatus + "");
+            String httpStatusMessage = (String) message.getOrDefault("http.response.info", "");
+            span.setStatus(StatusCode.ERROR, httpStatusMessage);
             span.recordException(e);
             throw e;
         } finally {
