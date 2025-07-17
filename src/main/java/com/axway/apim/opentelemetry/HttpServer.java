@@ -36,7 +36,7 @@ public class HttpServer {
         Context context = TEXT_MAP_PROPAGATOR.extract(Context.current(), headerSet, Utils.getter);
         String requestUri = Utils.getRequestURL(message);
         Trace.debug("OpenTelemetry Context " + context);
-        Span span = tracer.spanBuilder(httpVerb + " " + requestUri).setParent(context).setSpanKind(SpanKind.SERVER).startSpan();
+        Span span = tracer.spanBuilder(httpVerb + " " + apiName).setParent(context).setSpanKind(SpanKind.SERVER).startSpan();
         try (Scope ignored = span.makeCurrent()) {
             span.setAttribute("api.name", apiName);
             span.setAttribute("component", "http");
