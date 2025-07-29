@@ -4,7 +4,7 @@ Axway APIM Integration with OpenTelemetry using OpenTelemetry Java SDK
 
 ## API Management Version Compatibility
 
-This artefact tested with following version:
+This artifact tested with the following version:
 
 - V7.7 May 2024 
 
@@ -56,7 +56,7 @@ Copy following jar files
   - [opentelemetry-sdk-logs-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-logs/1.42.1/opentelemetry-sdk-logs-1.42.1.jar)
   - [opentelemetry-sdk-metrics-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-metrics/1.42.1/opentelemetry-sdk-metrics-1.42.1.jar)
   - [opentelemetry-sdk-trace-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-trace/1.42.1/opentelemetry-sdk-trace-1.42.1.jar)
-
+  - [opentelemetry-runtime-telemetry-java8-2.18.1-alpha.jar](https://repo1.maven.org/maven2/io/opentelemetry/instrumentation/opentelemetry-runtime-telemetry-java8/2.18.1-alpha/opentelemetry-runtime-telemetry-java8-2.18.1-alpha.jar)
 
 
 
