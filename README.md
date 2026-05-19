@@ -11,13 +11,17 @@ This artifact tested with the following version:
 
 ## Compile/Build
 
-In `build.gradle` file, update dependencies location:
-
-- Set the variable `apim_folder` to you API-Gateway installation folder (e.g. `opt/Axway/APIM/apigateway`)
+Set `apim_folder` to the API Gateway `system` folder so Gradle can compile against the APIM runtime jars:
 
 
 ```
-gradlew clean jar
+./gradlew clean jar -Papim_folder=/opt/Axway/apigateway/system
+```
+
+Alternatively, set `APIM_FOLDER`:
+
+```
+APIM_FOLDER=/opt/Axway/apigateway/system ./gradlew clean jar
 ```
 
 ## Setup
@@ -57,6 +61,7 @@ Copy following jar files
   - [opentelemetry-sdk-metrics-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-metrics/1.42.1/opentelemetry-sdk-metrics-1.42.1.jar)
   - [opentelemetry-sdk-trace-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-trace/1.42.1/opentelemetry-sdk-trace-1.42.1.jar)
   - [opentelemetry-runtime-telemetry-java8-2.18.1-alpha.jar](https://repo1.maven.org/maven2/io/opentelemetry/instrumentation/opentelemetry-runtime-telemetry-java8/2.18.1-alpha/opentelemetry-runtime-telemetry-java8-2.18.1-alpha.jar)
+  - [opentelemetry-instrumentation-api-2.18.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/instrumentation/opentelemetry-instrumentation-api/2.18.1/opentelemetry-instrumentation-api-2.18.1.jar)
 
 
 

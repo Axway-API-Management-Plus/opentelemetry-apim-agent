@@ -20,13 +20,24 @@ tasks.withType(JavaCompile) {
     options.compilerArgs += ['-Xlint:deprecation']
 }
 
-def apim_folder = '/Users/rnatarajan/v7apim/may2023/system'
+def apim_folder = providers.gradleProperty('apim_folder')
+    .orElse(providers.environmentVariable('APIM_FOLDER'))
+    .getOrElse('')
+
+if (!apim_folder) {
+    throw new GradleException('Set the APIM system folder with -Papim_folder=/path/to/apigateway/system or APIM_FOLDER=/path/to/apigateway/system')
+}
+
+def apimSystemDir = file(apim_folder)
+if (!apimSystemDir.isDirectory()) {
+    throw new GradleException("APIM system folder does not exist: ${apimSystemDir}")
+}
 
 def opentelemetry_version = "1.42.1"
 dependencies {
-    implementation fileTree(dir: "${apim_folder}/lib", include: '*.jar')
-    implementation fileTree(dir: "${apim_folder}/lib/jce", include: '*.jar')
-    implementation fileTree(dir: "${apim_folder}/lib/plugins", include: '*.jar')
+    implementation fileTree(dir: "${apimSystemDir}/lib", include: '*.jar')
+    implementation fileTree(dir: "${apimSystemDir}/lib/jce", include: '*.jar')
+    implementation fileTree(dir: "${apimSystemDir}/lib/plugins", include: '*.jar')
     implementation group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.22.1'
     implementation("io.opentelemetry:opentelemetry-api:${opentelemetry_version}")
     implementation("io.opentelemetry:opentelemetry-sdk:${opentelemetry_version}")
