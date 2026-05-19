@@ -33,22 +33,33 @@ if (!apimSystemDir.isDirectory()) {
     throw new GradleException("APIM system folder does not exist: ${apimSystemDir}")
 }
 
-def opentelemetry_version = "1.42.1"
+configurations {
+    apimAgentRuntime {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+    implementation.extendsFrom(apimAgentRuntime)
+}
+
+def opentelemetry_version = "1.52.0"
+def opentelemetry_instrumentation_version = "2.18.1"
+def opentelemetry_semconv_version = "1.34.0"
 dependencies {
     implementation fileTree(dir: "${apimSystemDir}/lib", include: '*.jar')
     implementation fileTree(dir: "${apimSystemDir}/lib/jce", include: '*.jar')
     implementation fileTree(dir: "${apimSystemDir}/lib/plugins", include: '*.jar')
-    implementation group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.22.1'
-    implementation("io.opentelemetry:opentelemetry-api:${opentelemetry_version}")
-    implementation("io.opentelemetry:opentelemetry-sdk:${opentelemetry_version}")
-    implementation("io.opentelemetry:opentelemetry-exporter-otlp:${opentelemetry_version}")
+    apimAgentRuntime group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.22.1'
+    apimAgentRuntime("io.opentelemetry:opentelemetry-api:${opentelemetry_version}")
+    apimAgentRuntime("io.opentelemetry:opentelemetry-sdk:${opentelemetry_version}")
+    apimAgentRuntime("io.opentelemetry:opentelemetry-exporter-otlp:${opentelemetry_version}")
 
-    implementation("io.opentelemetry:opentelemetry-sdk-metrics:${opentelemetry_version}")
-    implementation("io.opentelemetry:opentelemetry-exporter-logging:${opentelemetry_version}")
-    implementation("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure:${opentelemetry_version}")
+    apimAgentRuntime("io.opentelemetry:opentelemetry-sdk-metrics:${opentelemetry_version}")
+    apimAgentRuntime("io.opentelemetry:opentelemetry-exporter-logging:${opentelemetry_version}")
+    apimAgentRuntime("io.opentelemetry:opentelemetry-sdk-extension-autoconfigure:${opentelemetry_version}")
    // implementation("io.opentelemetry:opentelemetry-semconv:1.30.1-alpha")
-    implementation "io.opentelemetry.semconv:opentelemetry-semconv:1.27.0-alpha"
-    implementation "io.opentelemetry.instrumentation:opentelemetry-runtime-telemetry-java8:2.18.1-alpha"
+    apimAgentRuntime "io.opentelemetry.semconv:opentelemetry-semconv:${opentelemetry_semconv_version}"
+    apimAgentRuntime "io.opentelemetry.instrumentation:opentelemetry-runtime-telemetry-java8:${opentelemetry_instrumentation_version}-alpha"
+    apimAgentRuntime "io.opentelemetry.instrumentation:opentelemetry-instrumentation-api:${opentelemetry_instrumentation_version}"
 
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.12.4'
@@ -57,4 +68,13 @@ dependencies {
 }
 jar {
     metaInf { from('src/main/resources/aop.xml') }
+}
+
+tasks.register('assembleInstall', Copy) {
+    group = 'distribution'
+    description = 'Assembles the APIM agent jar and required runtime dependency jars for apigateway/ext/lib.'
+    dependsOn jar
+    into layout.buildDirectory.dir('install/opentelemetry-apim-agent')
+    from(tasks.named('jar'))
+    from(configurations.apimAgentRuntime)
 }

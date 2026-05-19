@@ -24,46 +24,26 @@ Alternatively, set `APIM_FOLDER`:
 APIM_FOLDER=/opt/Axway/apigateway/system ./gradlew clean jar
 ```
 
+To assemble the agent jar and required runtime dependency jars into one install directory, run:
+
+```
+./gradlew clean assembleInstall -Papim_folder=/opt/Axway/apigateway/system
+```
+
+The install directory is created at `build/install/opentelemetry-apim-agent`.
+
+The assembled directory is the source of truth for the runtime jar set. To review the exact files Gradle resolved for this build, run:
+
+```
+ls -1 build/install/opentelemetry-apim-agent/*.jar
+```
+
 ## Setup
 
-Copy following jar files
+Copy the assembled jar files:
 
-
-- Copy opentelemetry-apim-agent--x.x.x.jar file to apigateway/ext/lib
-- Copy Aspectj weaver - [ aspectjweaver-1.9.6.jar ](https://repo1.maven.org/maven2/org/aspectj/aspectjweaver/1.9.22.1/aspectjweaver-1.9.22.1.jar) to  apigateway/ext/lib
-- Copy opentelmetry sdk jar files to apigateway/ext/lib 
-
-  - [okhttp-4.12.0.jar](https://repo1.maven.org/maven2/com/squareup/okhttp3/okhttp/4.12.0/okhttp-4.12.0.jar)
-  - [okio-jvm-3.6.0.jar](https://repo1.maven.org/maven2/com/squareup/okio/okio-jvm/3.6.0/okio-jvm-3.6.0.jar)
-  - [kotlin-stdlib-1.9.25.jar](https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/1.9.25/kotlin-stdlib-1.9.25.jar)
-
-  - [opentelemetry-semconv-1.27.0-alpha.jar](https://repo1.maven.org/maven2/io/opentelemetry/semconv/opentelemetry-semconv/1.27.0-alpha/opentelemetry-semconv-1.27.0-alpha.jar)
-  
-  - [opentelemetry-api-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-api/1.42.1/opentelemetry-api-1.42.1.jar)
-  - [opentelemetry-api-incubator-1.42.1-alpha.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-api-incubator/1.42.1-alpha/opentelemetry-api-incubator-1.42.1-alpha.jar)
-  
-  - [opentelemetry-context-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-context/1.42.1/opentelemetry-context-1.42.1.jar)
-
-  - [opentelemetry-exporter-common-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-common/1.42.1/opentelemetry-exporter-common-1.42.1.jar)
-  - [opentelemetry-exporter-logging-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-logging/1.42.1/opentelemetry-exporter-logging-1.42.1.jar)
-  - [opentelemetry-exporter-otlp-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-otlp/1.42.1/opentelemetry-exporter-otlp-1.42.1.jar)
-  - [opentelemetry-exporter-otlp-common-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-otlp-common/1.42.1/opentelemetry-exporter-otlp-common-1.42.1.jar)
-  - [opentelemetry-exporter-sender-okhttp-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-exporter-sender-okhttp/1.42.1/opentelemetry-exporter-sender-okhttp-1.42.1.jar)
-
-  - [opentelemetry-sdk-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk/1.42.1/opentelemetry-sdk-1.42.1.jar)
-  - [opentelemetry-sdk-common-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-common/1.42.1/opentelemetry-sdk-common-1.42.1.jar)
-  - [opentelemetry-sdk-extension-autoconfigure-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-extension-autoconfigure/1.42.1/opentelemetry-sdk-extension-autoconfigure-1.42.1.jar)
-  - [opentelemetry-sdk-extension-autoconfigure-spi-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-extension-autoconfigure-spi/1.42.1/opentelemetry-sdk-extension-autoconfigure-spi-1.42.1.jar)
- 
-  
-  - [opentelemetry-extension-incubator-1.30.1-alpha.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-extension-incubator/1.30.1-alpha/opentelemetry-extension-incubator-1.30.1-alpha.jar)
-  - [opentelemetry-sdk-logs-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-logs/1.42.1/opentelemetry-sdk-logs-1.42.1.jar)
-  - [opentelemetry-sdk-metrics-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-metrics/1.42.1/opentelemetry-sdk-metrics-1.42.1.jar)
-  - [opentelemetry-sdk-trace-1.42.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-sdk-trace/1.42.1/opentelemetry-sdk-trace-1.42.1.jar)
-  - [opentelemetry-runtime-telemetry-java8-2.18.1-alpha.jar](https://repo1.maven.org/maven2/io/opentelemetry/instrumentation/opentelemetry-runtime-telemetry-java8/2.18.1-alpha/opentelemetry-runtime-telemetry-java8-2.18.1-alpha.jar)
-  - [opentelemetry-instrumentation-api-2.18.1.jar](https://repo1.maven.org/maven2/io/opentelemetry/instrumentation/opentelemetry-instrumentation-api/2.18.1/opentelemetry-instrumentation-api-2.18.1.jar)
-
-
+- Copy all jar files from `build/install/opentelemetry-apim-agent` to `apigateway/ext/lib`.
+- Remove any previously copied OpenTelemetry/APIM agent jars from `apigateway/ext/lib` before copying the newly assembled jars. Do not leave older OpenTelemetry versions beside the assembled set.
 
 - Create a file named jvm.xml under APIGATEWAY_INSTALL_DIR/apigateway/conf/
     ```xml
