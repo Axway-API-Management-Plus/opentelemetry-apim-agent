@@ -2,6 +2,7 @@ package com.axway.apim.aspects;
 
 import com.axway.apim.opentelemetry.ConnectToUrl;
 import com.axway.apim.opentelemetry.HttpServer;
+import com.axway.apim.opentelemetry.Telemetry;
 import com.axway.apim.opentelemetry.Utils;
 import com.vordel.circuit.InvocationContext;
 import com.vordel.circuit.Message;
@@ -41,10 +42,17 @@ public class AxwayAspect {
      */
     @Around("invokeGateway(m, lastChanceHandler, context)")
     public Object invokePointcutGateway(ProceedingJoinPoint pjp, Message m, MessageProcessor lastChanceHandler, Object context) throws Throwable {
-        String requestPath = (String) m.get("http.request.path");
-        String[] uriSplit = requestPath.split("/");
-        String apiName = uriSplit.length == 0 ? "/" : uriSplit[1];
-        String httpVerb = Utils.getHttpMethod(m);
+        String apiName;
+        String httpVerb;
+        try {
+            String requestPath = (String) m.get("http.request.path");
+            String[] uriSplit = requestPath.split("/");
+            apiName = uriSplit.length > 1 ? uriSplit[1] : "/";
+            httpVerb = Utils.getHttpMethod(m);
+        } catch (Throwable e) {
+            Telemetry.disable("gateway advice setup", e);
+            return pjp.proceed();
+        }
         return httpServer.aroundHttpServer(pjp, m, apiName, httpVerb);
     }
 
@@ -86,9 +94,15 @@ public class AxwayAspect {
                                            MessageProcessor lastChanceHandler, InvokableMethod runMethod,
                                            final PathResolverResult resolvedMethod, final int matchCount,
                                            String httpMethod, ApiShunt currentApiCallStatus) throws Throwable {
-        String[] uriSplit = Utils.getRequestURL(m).split("/");
         String apiName;
-        apiName = (String) m.getOrDefault("api.name", uriSplit[1]);
+        try {
+            String[] uriSplit = Utils.getRequestURL(m).split("/");
+            String defaultApiName = uriSplit.length > 1 ? uriSplit[1] : "/";
+            apiName = (String) m.getOrDefault("api.name", defaultApiName);
+        } catch (Throwable e) {
+            Telemetry.disable("API Manager advice setup", e);
+            return pjp.proceed();
+        }
         return httpServer.aroundHttpServer(pjp, m, apiName, httpMethod);
     }
 
@@ -100,9 +114,22 @@ public class AxwayAspect {
 
     @Around("apiManagerFaultHandler(shuntReason, m, ctx)")
     public Object handleApiManagerFaultHandler(ProceedingJoinPoint pjp, ApiShunt shuntReason, Message m, InvocationContext ctx) throws Throwable {
-        // Only handle API not found case
-        if (shuntReason.getStatusCode() == 404) {
-            return httpServer.aroundHttpServer(pjp, m, "NotFound",  Utils.getHttpMethod(m));
+        boolean traceNotFound;
+        try {
+            traceNotFound = shuntReason.getStatusCode() == 404;
+        } catch (Throwable e) {
+            Telemetry.disable("API Manager fault advice setup", e);
+            return pjp.proceed();
+        }
+        if (traceNotFound) {
+            String httpMethod;
+            try {
+                httpMethod = Utils.getHttpMethod(m);
+            } catch (Throwable e) {
+                Telemetry.disable("API Manager fault advice setup", e);
+                return pjp.proceed();
+            }
+            return httpServer.aroundHttpServer(pjp, m, "NotFound", httpMethod);
         }
         return pjp.proceed();
     }

@@ -4,7 +4,6 @@ import com.vordel.circuit.Message;
 import com.vordel.dwe.CorrelationID;
 import com.vordel.mime.HeaderSet;
 import com.vordel.trace.Trace;
-import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.StatusCode;
@@ -21,23 +20,23 @@ import java.util.Map;
 public class HttpServer {
 
 
-    private static final OpenTelemetry openTelemetry = Configuration.getInstance();
-    private static final Tracer tracer =
-        openTelemetry.getTracer("io.opentelemetry.axway.apim.http.HttpServer");
-
-    private static final TextMapPropagator TEXT_MAP_PROPAGATOR =
-        openTelemetry.getPropagators().getTextMapPropagator();
-
-
     public Object aroundHttpServer(ProceedingJoinPoint pjp, Message message, String apiName, String httpVerb) throws Throwable {
 
-        Object pjpReturnObject;
-        HeaderSet headerSet = (HeaderSet) message.get(Utils.HTTP_HEADERS);
-        Context context = TEXT_MAP_PROPAGATOR.extract(Context.current(), headerSet, Utils.getter);
-        String requestUri = Utils.getRequestURL(message);
-        Trace.debug("OpenTelemetry Context " + context);
-        Span span = tracer.spanBuilder(httpVerb + " " + apiName).setParent(context).setSpanKind(SpanKind.SERVER).startSpan();
-        try (Scope ignored = span.makeCurrent()) {
+        Tracer tracer = Telemetry.getTracer("io.opentelemetry.axway.apim.http.HttpServer");
+        TextMapPropagator textMapPropagator = Telemetry.getTextMapPropagator();
+        if (tracer == null || textMapPropagator == null) {
+            return pjp.proceed();
+        }
+
+        Span span = null;
+        Scope scope = null;
+        try {
+            HeaderSet headerSet = (HeaderSet) message.get(Utils.HTTP_HEADERS);
+            Context context = textMapPropagator.extract(Context.current(), headerSet, Utils.getter);
+            String requestUri = Utils.getRequestURL(message);
+            Trace.debug("OpenTelemetry Context " + context);
+            span = tracer.spanBuilder(httpVerb + " " + apiName).setParent(context).setSpanKind(SpanKind.SERVER).startSpan();
+            scope = span.makeCurrent();
             span.setAttribute("api.name", apiName);
             span.setAttribute("component", "http");
             span.setAttribute("http.method", httpVerb);
@@ -52,7 +51,34 @@ public class HttpServer {
             String orgName = (String) message.getOrDefault("authentication.organization.name", Utils.DEFAULT);
             String appId = (String) message.getOrDefault("authentication.subject.id", Utils.DEFAULT);
             addRequestAttributes(span, appName, orgName, appId, message.getIDBase());
+        } catch (Throwable e) {
+            closeScope(scope);
+            endSpan(span, message);
+            Telemetry.disable("HTTP server span setup", e);
+            return pjp.proceed();
+        }
+
+        Object pjpReturnObject;
+        Throwable pjpError = null;
+        try {
             pjpReturnObject = pjp.proceed();
+        } catch (Throwable e) {
+            pjpError = e;
+            recordException(span, message, e);
+            throw e;
+        } finally {
+            closeScope(scope);
+            if (pjpError != null) {
+                endSpan(span, message);
+            }
+        }
+        recordResponse(span, message);
+        endSpan(span, message);
+        return pjpReturnObject;
+    }
+
+    private void recordResponse(Span span, Message message) {
+        try {
             int httpStatus = (int) message.getOrDefault("http.response.status", 0);
             String httpStatusMessage = (String) message.getOrDefault("http.response.info", "");
             if (httpStatus > 500) {
@@ -60,19 +86,42 @@ public class HttpServer {
                 span.setAttribute("error.type", "internal server error");
             }
         } catch (Throwable e) {
-            int httpStatus = (int) message.getOrDefault("http.response.status", 0);
-            String httpStatusMessage = (String) message.getOrDefault("http.response.info", "");
-            span.setStatus(StatusCode.ERROR, httpStatus + "-" +httpStatusMessage);
-            span.recordException(e);
-            throw e;
-        } finally {
-            // Close the span
-            Utils.addHttpHeaders(span, "response", (HeaderSet) message.get(Utils.HTTP_HEADERS));
-            span.end();
+            Telemetry.recordFailure("HTTP server response recording", e);
         }
-        return pjpReturnObject;
     }
 
+    private void recordException(Span span, Message message, Throwable original) {
+        try {
+            int httpStatus = (int) message.getOrDefault("http.response.status", 0);
+            String httpStatusMessage = (String) message.getOrDefault("http.response.info", "");
+            span.setStatus(StatusCode.ERROR, httpStatus + "-" + httpStatusMessage);
+            span.recordException(original);
+        } catch (Throwable e) {
+            Telemetry.recordFailure("HTTP server exception recording", e);
+        }
+    }
+
+    private void endSpan(Span span, Message message) {
+        if (span == null) {
+            return;
+        }
+        try {
+            Utils.addHttpHeaders(span, "response", (HeaderSet) message.get(Utils.HTTP_HEADERS));
+            span.end();
+        } catch (Throwable e) {
+            Telemetry.recordFailure("HTTP server span close", e);
+        }
+    }
+
+    private void closeScope(Scope scope) {
+        if (scope != null) {
+            try {
+                scope.close();
+            } catch (Throwable e) {
+                Telemetry.recordFailure("HTTP server scope close", e);
+            }
+        }
+    }
 
     public void addRequestAttributes(Span span, String appName, String orgName, String appId, CorrelationID correlationId) {
         Map<String, String> map = new HashMap<>();
