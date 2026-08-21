@@ -6,7 +6,8 @@ Axway APIM Integration with OpenTelemetry using OpenTelemetry Java SDK
 
 This artifact tested with the following version:
 
-- V7.7 May 2024 
+- V7.7 Feb 2026 use main branch
+- V7.7 May 2024 use may2024 branch
 
 
 ## Compile/Build
@@ -51,6 +52,17 @@ Copy the assembled jar files:
         <VMArg name="-javaagent:/home/axway/Axway-7.7.0/apigateway/ext/lib/aspectjweaver-1.9.22.1.jar"/>
     </ConfigurationFragment>
     ```
+
+## API Gateway without API Manager
+
+Add additional configuration in jvm.xml file to capture requests from API Gateway without API Manager.
+
+```xml
+<ConfigurationFragment>
+    <VMArg name="-javaagent:/home/axway/Axway-7.7.0/apigateway/ext/lib/aspectjweaver-1.9.22.1.jar"/>
+    <VMArg name="-Dapimanager=false"/>
+</ConfigurationFragment>
+```
 - Restart API Gateway instances
 
 # Testing with Jaeger

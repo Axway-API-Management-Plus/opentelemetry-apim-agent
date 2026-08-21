@@ -33,9 +33,9 @@ public class ConnectToUrl {
             pjpReturnObject = pjp.proceed();
             int httpStatus = (int) message.getOrDefault("http.response.status", 0);
             String httpStatusMessage = (String) message.getOrDefault("http.response.info", "");
-            if (httpStatus > 400 && httpStatus < 500) {
+            if (httpStatus >= 400 && httpStatus < 500) {
                 span.setStatus(StatusCode.ERROR, httpStatusMessage);
-            } else if (httpStatus > 500) {
+            } else if (httpStatus >= 500) {
                 span.setStatus(StatusCode.ERROR, httpStatusMessage);
                 span.setAttribute("error.type", httpStatusMessage);
             }

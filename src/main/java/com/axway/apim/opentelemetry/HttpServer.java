@@ -12,6 +12,7 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.TextMapPropagator;
+import io.opentelemetry.semconv.HttpAttributes;
 import org.aspectj.lang.ProceedingJoinPoint;
 
 import java.net.URL;
@@ -40,7 +41,7 @@ public class HttpServer {
         try (Scope ignored = span.makeCurrent()) {
             span.setAttribute("api.name", apiName);
             span.setAttribute("component", "http");
-            span.setAttribute("http.method", httpVerb);
+            span.setAttribute(HttpAttributes.HTTP_REQUEST_METHOD, httpVerb);
             URL requestUrl = (URL) message.get("http.request.url");
             if (requestUrl != null) {
                 Utils.addHttpDetails(span, requestUrl.toString(), requestUri, message);
@@ -48,20 +49,22 @@ public class HttpServer {
                 Utils.addHttpDetails(span, null, requestUri, message);
             }
             Utils.addHttpHeaders(span, "request", headerSet);
-            String appName = (String) message.getOrDefault("authentication.application.name", Utils.DEFAULT);
-            String orgName = (String) message.getOrDefault("authentication.organization.name", Utils.DEFAULT);
-            String appId = (String) message.getOrDefault("authentication.subject.id", Utils.DEFAULT);
+            String appName = Utils.getOrDefault(message, "authentication.application.name", Utils.DEFAULT);
+            String orgName = Utils.getOrDefault(message, "authentication.organization.name", Utils.DEFAULT);
+            String appId = Utils.getOrDefault(message, "authentication.subject.id", Utils.DEFAULT);
             addRequestAttributes(span, appName, orgName, appId, message.getIDBase());
             pjpReturnObject = pjp.proceed();
-            int httpStatus = (int) message.getOrDefault("http.response.status", 0);
-            String httpStatusMessage = (String) message.getOrDefault("http.response.info", "");
-            if (httpStatus > 500) {
+            int httpStatus = Utils.getHttpResponseStatus(message);
+            String httpStatusMessage = Utils.getOrDefault(message, "http.response.info", "");
+            if (httpStatus >= 500) {
                 span.setStatus(StatusCode.ERROR, httpStatusMessage);
                 span.setAttribute("error.type", "internal server error");
             }
+            span.setAttribute(HttpAttributes.HTTP_RESPONSE_STATUS_CODE, httpStatus);
+
         } catch (Throwable e) {
-            int httpStatus = (int) message.getOrDefault("http.response.status", 0);
-            String httpStatusMessage = (String) message.getOrDefault("http.response.info", "");
+            int httpStatus = Utils.getHttpResponseStatus(message);
+            String httpStatusMessage = Utils.getOrDefault(message, "http.response.info", "");
             span.setStatus(StatusCode.ERROR, httpStatus + "-" +httpStatusMessage);
             span.recordException(e);
             throw e;

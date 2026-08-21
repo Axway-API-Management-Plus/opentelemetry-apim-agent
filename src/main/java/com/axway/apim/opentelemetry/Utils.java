@@ -6,6 +6,7 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.propagation.TextMapGetter;
 import io.opentelemetry.context.propagation.TextMapSetter;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Map;
@@ -17,7 +18,7 @@ public final class Utils {
     public static final String DEFAULT = "default";
     public static final String AXWAY_CORRELATION_ID = "AxwayCorrelationId";
     public static final TextMapGetter<HeaderSet> getter = new
-        TextMapGetter<HeaderSet>() {
+        TextMapGetter<>() {
             @Override
             public Iterable<String> keys(HeaderSet carrier) {
                 return convertIterableFromIterator(carrier.getHeaderNames());
@@ -25,7 +26,7 @@ public final class Utils {
 
             @Nullable
             @Override
-            public String get(@Nullable HeaderSet carrier, String key) {
+            public String get(@Nullable HeaderSet carrier, @Nonnull String key) {
                 if (carrier != null) {
                     return carrier.getHeader(key);
                 }
@@ -35,12 +36,12 @@ public final class Utils {
 
     // setup context on outgoing headers
     public static final TextMapSetter<HeaderSet> setter =
-            (carrier, key, value) -> {
-                // Insert the context as Header
-                if (carrier != null) {
-                    carrier.setHeader(key, value);
-                }
-            };
+        (carrier, key, value) -> {
+            // Insert the context as Header
+            if (carrier != null) {
+                carrier.setHeader(key, value);
+            }
+        };
 
 
     private Utils() {
@@ -53,12 +54,29 @@ public final class Utils {
     }
 
     public static String getRequestURL(Message message) {
-        return message.getOrDefault("http.request.uri", message.get("http.request.path")).toString();
+        return getOrDefault(message, "http.request.uri", getOrDefault(message, "http.request.path", "/"));
     }
 
     public static String getHttpMethod(Message message) {
-        return message.getOrDefault("http.request.verb", "GET").toString();
+        return getOrDefault(message, "http.request.verb", "GET");
     }
+
+    public static String getOrDefault(Message message, String key, String defaultName) {
+        Object value = message.get(key);
+        if (value == null) {
+            return defaultName;
+        }
+        return value.toString();
+    }
+
+    public static int getHttpResponseStatus(Message message) {
+        Object value = message.get("http.response.status");
+        if (value == null) {
+            return 500;
+        }
+        return Integer.parseInt(value.toString());
+    }
+
 
     public static void addHttpDetails(Span span, String url, String requestUri, Message message) {
              /*
@@ -86,10 +104,8 @@ public final class Utils {
 
 
     public static void addHttpHeaders(Span span, String type, HeaderSet headers) {
-        StringBuilder headerPrefix = new StringBuilder();
-        headerPrefix.append(type);
-        headerPrefix.append(".http.header.");
-        String prefix = headerPrefix.toString();
+        String prefix = type +
+            ".http.header.";
         if (headers != null) {
             for (Map.Entry<String, HeaderSet.HeaderEntry> entry : headers.entrySet()) {
                 String value = getHeaderValues(entry);
