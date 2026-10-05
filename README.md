@@ -1,3 +1,13 @@
+# ⚠️ PROJECT ARCHIVED
+
+This project is **no longer actively maintained** and has been archived. 
+Development has moved to our new repository:
+
+👉 **[Link to new Project](https://github.com/Axway-API-Management-Plus/apim-otel-agent)**
+
+---
+
+
 # OpenTelemetry Axway APIM Integration
 
 Axway APIM Integration with OpenTelemetry using OpenTelemetry Java SDK
